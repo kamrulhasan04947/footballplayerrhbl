@@ -39,4 +39,31 @@ router.post('/submit_form', async (req, res) => {
     }       
 });
 
+
+
+router.get('/get_form_data', async (req, res) => {
+    try {
+        const formData = await Form_Data.find({});  
+        res.status(200).json({ data: formData });
+    } catch (error) {
+        console.error('Error retrieving form data:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }   
+});
+
+
+router.get('/get_form_data/:id', async (req, res) => {
+    try {
+        const formData = await Form_Data.findOne({ id: req.params.id });    
+        if (!formData) {
+            return res.status(404).json({ message: 'Form data not found' });
+        }
+        res.status(200).json({ data: formData });
+    }
+    catch (error) {
+        console.error('Error retrieving form data:', error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
 module.exports = router;
