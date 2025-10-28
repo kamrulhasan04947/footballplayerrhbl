@@ -27,7 +27,6 @@ const formSchema = new mongoose.Schema({
     photo:{
         type:String,
         default:null,
-        trim:true,
     }
 },
  {timestamps: true,}
