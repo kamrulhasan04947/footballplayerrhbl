@@ -86,4 +86,30 @@ router.get('/get_form_data/:id', async (req, res) => {
     }
 });
 
+
+router.get('/get_form_data/bypage', async (req, res) => {
+  try {
+    const page = parseInt(req.query.page) || 1; // default: page 1
+    const limit = parseInt(req.query.limit) || 20; // default: 100 records per page
+    const skip = (page - 1) * limit;
+
+    const total = await Form_Data.countDocuments();
+    const formData = await Form_Data.find({})
+      .skip(skip)
+      .limit(limit)
+      .sort({ _id: -1 }); // newest first
+
+    res.status(200).json({
+      total,
+      page,
+      limit,
+      data: formData
+    });
+  } catch (error) {
+    console.error('Error retrieving form data:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+});
+
+
 module.exports = router;
