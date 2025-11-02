@@ -30,20 +30,19 @@ function convertDriveLinkToViewable(url) {
 router.post('/submit_form', async (req, res) => {
     try {
         const {id, name, department, role , photo} = req.body;
-        viewablePhoto = convertDriveLinkToViewable(photo);
-        if(!id || !name || !department || !role || !viewablePhoto){
+        if(!id || !name || !department || !role){
             return  res.status(400).json({ message: 'All fields are required' });
+
         }
         const existingEntry = await Form_Data.findOne({ id: id });
         if (existingEntry) {
             return res.status(409).json({ message: 'An entry with this ID already exists' });
         }
-
-        const base64Image = await linkToBase64Image(viewablePhoto);
-        if (!base64Image) {
-            return res.status(400).json({ message: 'Could not fetch image from Drive link' });
+        let base64Image = null;
+        if(photo){
+            const viewablePhoto = convertDriveLinkToViewable(photo);
+            base64Image = await linkToBase64Image(viewablePhoto);
         }
-
         const newFormData = new Form_Data({
             id: id,
             name : name,
@@ -90,7 +89,7 @@ router.get('/get_form_data/:id', async (req, res) => {
 router.get('/get_form_data/bypage', async (req, res) => {
   try {
     const page = parseInt(req.query.page) || 1; // default: page 1
-    const limit = parseInt(req.query.limit) || 20; // default: 100 records per page
+    const limit = parseInt(req.query.limit) || 20; // default:20 records per page
     const skip = (page - 1) * limit;
 
     const total = await Form_Data.countDocuments();
